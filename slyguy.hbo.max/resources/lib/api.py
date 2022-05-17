@@ -74,6 +74,7 @@ class API(object):
         data = self._session.post(self.url('tokens'), data=payload, headers=headers).json()
         self._check_errors(data)
 
+        log.debug('bvba _oauth_token access token: {}'.format(data['access_token']))
         self._set_authentication(data['access_token'])
         userdata.set('access_token', data['access_token'])
         userdata.set('expires', int(time() + data['expires_in'] - 15))
@@ -421,6 +422,7 @@ class API(object):
 
     def play(self, slug):
         self._refresh_token()
+        log.debug('bvba play: {}'.format(slug))
 
         content_data = self.express_content(slug)
         edits = content_data.get('edits', [])

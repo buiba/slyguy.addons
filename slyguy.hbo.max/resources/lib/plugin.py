@@ -652,6 +652,7 @@ def callback(url, cut_id, runtime, _time, **kwargs):
 @plugin.route()
 def play(slug, **kwargs):
     data, content, edit = api.play(slug)
+    log.debug('bvba plugin play {} -> {} -> {}'.format(slug, content, edit))
     if not data or not content or not edit:
         return
 
