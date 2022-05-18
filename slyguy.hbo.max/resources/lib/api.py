@@ -316,7 +316,7 @@ class API(object):
         language = userdata.get('language', 'auto')
         if language == 'auto':
             language = xbmc.getLanguage(xbmc.ISO_639_1, True).replace('no-', 'nb-')
-            log.debug('Using Kodi language: {}'.format(language))
+            log.debug(': {}'.format(language))
 
         available = [x['code'] for x in self.get_languages()]
         log.debug('Available languages: {}'.format(available))
@@ -413,6 +413,7 @@ class API(object):
     def search(self, query):
         key = 'urn:hbo:flexisearch:{}'.format(query)
         data = self.content([{'id': key}])
+        log.debug('search key: {}'.format(query))
 
         for key in data:
             if key.startswith('urn:hbo:grid:search') and key.endswith('-all'):

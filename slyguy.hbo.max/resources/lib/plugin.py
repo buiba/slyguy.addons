@@ -203,6 +203,7 @@ def select_language(**kwargs):
 
 @plugin.route()
 def watchlist(**kwargs):
+    log.debug('watchlist')
     folder = plugin.Folder(_.WATCHLIST)
 
     rows = api.watchlist()
@@ -213,6 +214,7 @@ def watchlist(**kwargs):
 
 @plugin.route()
 def add_watchlist(slug, title=None, icon=None, **kwargs):
+    log.debug('watchlist')
     gui.notification(_.ADDED_WATCHLIST, heading=title, icon=icon)
     api.add_watchlist(slug)
 
@@ -397,6 +399,7 @@ def _image(url, size='360x203', protection=False):
 @plugin.route()
 @plugin.search()
 def search(query, page, **kwargs):
+    log.debug('search')
     data = api.search(query)
     return _process_rows(data['items'], 'search') if data else [], False
 
@@ -532,6 +535,7 @@ def _get_play_path(slug):
 @plugin.route()
 @plugin.plugin_middleware()
 def mpd_request(_data, _path, **kwargs):
+    log.debug('mpd_request')
     data = _data.decode('utf8')
 
     data = data.replace('_xmlns:cenc', 'xmlns:cenc')
@@ -652,6 +656,7 @@ def callback(url, cut_id, runtime, _time, **kwargs):
 @plugin.route()
 def play(slug, **kwargs):
     data, content, edit = api.play(slug)
+    log.debug('play')
     log.debug('bvba plugin play {} -> {} -> {}'.format(slug, content, edit))
     if not data or not content or not edit:
         return
