@@ -535,7 +535,7 @@ def _get_play_path(slug):
 @plugin.route()
 @plugin.plugin_middleware()
 def mpd_request(_data, _path, **kwargs):
-    log.debug('mpd_request')
+    log.debug('bvba mpd_request {}'.format(data))
     data = _data.decode('utf8')
 
     data = data.replace('_xmlns:cenc', 'xmlns:cenc')
@@ -760,6 +760,7 @@ def play(slug, **kwargs):
 def logout(**kwargs):
     if not gui.yes_no(_.LOGOUT_YES_NO):
         return
+    log.debug('bvba logout')
 
     api.logout()
     userdata.delete('kid_lockdown')

@@ -45,24 +45,37 @@ class API(object):
 
     def url(self, name, path=''):
         config = self._client_config()
+        
+        log.debug('bvba config {} -> {}'.format(**config))
+        log.debug('bvba path'.format(path))
 
         if name == 'tokens':
-            return 'https://oauth{userSubdomain}.{domain}.hbo.com/auth/tokens'.format(**config['routeKeys'])
+            tokenPath = 'https://oauth{userSubdomain}.{domain}.hbo.com/auth/tokens'.format(**config['routeKeys'])
+            log.debug('bvba tokenPath {}'.format(tokenPath))
+            return tokenPath
 
         elif name == 'gateway':
-            return 'https://gateway{userSubdomain}.{domain}.hbo.com'.format(**config['routeKeys']) + path
+            getwayPath = 'https://gateway{userSubdomain}.{domain}.hbo.com'.format(**config['routeKeys']) + path
+            log.debug('bvba getwayPath {}'.format(getwayPath))
+            return getwayPath
 
         elif name == 'sessions':
-            return 'https://sessions{userSubdomain}.{domain}.hbo.com'.format(**config['routeKeys']) + path
+            sessionsPath = 'https://sessions{userSubdomain}.{domain}.hbo.com'.format(**config['routeKeys']) + path
+            log.debug('sessionsPath {}'.format(sessionsPath))
 
         elif name == 'comet':
-            return 'https://comet{userSubdomain}.{domain}.hbo.com'.format(**config['routeKeys']) + path
+            cometPath = 'https://comet{userSubdomain}.{domain}.hbo.com'.format(**config['routeKeys']) + path
+            log.debug("commet request url {}".format(cometPath))
+            return cometPath
 
         elif name == 'markers':
-            return 'https://markers{userSubdomain}.{domain}.hbo.com'.format(**config['routeKeys']) + path
+            markersPath = 'https://markers{userSubdomain}.{domain}.hbo.com'.format(**config['routeKeys']) + path
+            log.debug("markersPath {}".format(markersPath))
+            return markersPath
 
         elif name == 'artist':
-            return 'https://artist.{cdnDomain}.hbo.com'.format(**config['routeKeys']) + path
+            artistPath = 'https://artist.{cdnDomain}.hbo.com'.format(**config['routeKeys']) + path
+            log.debug('artistPath {}'.format(artistPath))
 
         else:
             return None
@@ -70,6 +83,7 @@ class API(object):
     def _oauth_token(self, payload, headers=None):
         self.logged_in = False
         mem_cache.delete('config')
+        log.debug('bvba token {}'.format(self.url('token')))
 
         data = self._session.post(self.url('tokens'), data=payload, headers=headers).json()
         self._check_errors(data)
@@ -102,6 +116,8 @@ class API(object):
     def _guest_login(self):
         serial = self._device_serial()
 
+        log.debug('bvba guest login {}'.format(serial))
+
         payload = {
             'client_id': CLIENT_ID,
             'client_secret': CLIENT_ID,
@@ -114,6 +130,8 @@ class API(object):
         }
 
         data = self._session.post(GUEST_AUTH, json=payload, headers={'Authorization': None}).json()
+
+        log.debug('bvba guest login {}'.format(data))
         if 'code' in data and data['code'] == 'invalid_credentials':
             raise APIError(_.BLOCKED_IP)
 
@@ -413,7 +431,7 @@ class API(object):
     def search(self, query):
         key = 'urn:hbo:flexisearch:{}'.format(query)
         data = self.content([{'id': key}])
-        log.debug('search key: {}'.format(query))
+        log.debug('bvba search key: {}'.format(query))
 
         for key in data:
             if key.startswith('urn:hbo:grid:search') and key.endswith('-all'):
@@ -423,7 +441,7 @@ class API(object):
 
     def play(self, slug):
         self._refresh_token()
-        log.debug('bvba play: {}'.format(slug))
+        log.debug('bvba play: {} -> {}'.format(slug, self))
 
         content_data = self.express_content(slug)
         edits = content_data.get('edits', [])
@@ -469,6 +487,7 @@ class API(object):
 
         for row in data.get('manifests', []):
             if row['type'] == 'urn:video:main':
+                log.debug('bvba api play {} -> {} -> {}'.format(row, content_data, edit))
                 return row, content_data, edit
 
         raise APIError(_.NO_VIDEO_FOUND)
